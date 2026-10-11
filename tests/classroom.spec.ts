@@ -71,7 +71,8 @@ test("P06 discovery, repeat mentions, downstream classification, recommendations
   expect(s.mentions.window).toBe(3);
   await expect(page.locator(".map-marker.active")).toHaveCount(1);
   await page.getByRole("button", { name: "世界之窗详情" }).click();
-  await expect(page.getByRole("dialog")).toContainText("真实素材待补");
+  await expect(page.getByRole("dialog")).toContainText("AI 生成教学插画");
+  await expect(page.getByRole("dialog").locator(".atlas-image")).toBeVisible();
   await page.keyboard.press("Escape");
   await go(page, 7);
   await expect(page.locator(".sort-grid")).toContainText("世界之窗");
@@ -180,6 +181,14 @@ test("fully offline reload and complete lesson using cached local resources", as
     await go(page, i);
     await expect(page.locator("main h1")).toBeVisible();
   }
+  await go(page, 1);
+  await expect
+    .poll(() =>
+      page
+        .locator(".clue .atlas-image")
+        .evaluate((e: HTMLImageElement) => e.complete && e.naturalWidth > 0),
+    )
+    .toBe(true);
   await go(page, 3);
   await expect(page.locator(".book img")).toBeVisible();
   await expect
@@ -200,6 +209,7 @@ test("fully offline reload and complete lesson using cached local resources", as
 test("missing photo gracefully degrades and JSON restores classroom", async ({
   page,
 }) => {
+  await page.route("**/assets/generated/**", (route) => route.abort());
   await page.goto("/");
   await expect(page.locator(".clue .placeholder")).toContainText(
     "真实素材待补",
@@ -256,4 +266,64 @@ test("city sequence, clues, reveal flags and touch-sized map controls", async ({
     .getByRole("button", { name: "＋ Another Place!（无须输入）" })
     .click();
   await expect(page.locator(".another")).toContainText("未定位");
+});
+test("illustrations render, hints stay hidden, preview zoom and highlight do not fake visitor evidence", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator(".clue figcaption")).toHaveText(
+    "AI 生成教学插画 · 非实拍 · 非精确复原",
+  );
+  await expect
+    .poll(() =>
+      page
+        .locator(".clue .atlas-image")
+        .evaluate(
+          (e: HTMLImageElement) =>
+            e.complete && e.naturalWidth === 1536 && e.naturalHeight === 1024,
+        ),
+    )
+    .toBe(true);
+  await page.locator("main h1").click();
+  await page.keyboard.press(" ");
+  expect(
+    await page
+      .locator(".clue .atlas-image")
+      .evaluate((e) => (e as HTMLElement).style.left),
+  ).toBe("-100%");
+  await go(page, 6);
+  await expect(page.locator(".picture-hints")).toHaveCount(0);
+  await page.getByRole("button", { name: "Hint", exact: true }).click();
+  await expect(page.locator(".picture-hints .atlas-image")).toBeVisible();
+  await page.getByRole("button", { name: "下一张图片提示" }).click();
+  expect(
+    await page
+      .locator(".picture-hints .atlas-image")
+      .evaluate((e) => (e as HTMLElement).style.left),
+  ).toBe("-100%");
+  await page.getByRole("button", { name: "隐藏支架 / 图片提示" }).click();
+  await page
+    .locator(".quick-list")
+    .getByRole("button", { name: /世界之窗/ })
+    .click();
+  await page.getByRole("button", { name: "世界之窗详情" }).click();
+  await page.getByLabel("素材缩放").fill("2");
+  expect(
+    await page
+      .locator(".media-stage")
+      .evaluate((e) => (e as HTMLElement).style.width),
+  ).toBe("200%");
+  await page.getByRole("button", { name: "手动高亮" }).click();
+  await page.locator(".media-stage").click({ position: { x: 100, y: 100 } });
+  await expect(page.getByLabel("教师手动高亮区域")).toBeVisible();
+  await page.getByRole("button", { name: "还原完整素材" }).click();
+  await expect(page.getByLabel("教师手动高亮区域")).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await go(page, 9);
+  await page.getByRole("button", { name: "放大原帖截图" }).click();
+  await expect(page.getByRole("dialog").locator(".atlas-image")).toHaveCount(0);
+  await expect(page.getByRole("dialog")).toContainText("真实素材待补");
+  await expect(
+    page.getByRole("button", { name: "查看已核验 360 全景" }),
+  ).toHaveCount(0);
 });

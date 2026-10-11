@@ -969,3 +969,159 @@ footer button {
   letter-spacing: 0.02em;
   margin-top: 5px;
 }
+.illustrated-media {
+  margin: 0;
+  max-width: 100%;
+}
+.atlas-tile {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3/2;
+  border-radius: 18px;
+  background: #e5eddc;
+}
+.atlas-image {
+  position: absolute;
+  width: 400%;
+  height: 400%;
+  max-width: none;
+  object-fit: fill;
+}
+.illustrated-media figcaption {
+  font-size: 0.65rem;
+  color: #547163;
+  padding: 8px 2px;
+  letter-spacing: 0.01em;
+}
+.clue .atlas-tile {
+  max-height: 310px;
+}
+.scenario-grid .atlas-tile {
+  border-radius: 12px;
+}
+.scenario-grid article {
+  padding: 18px;
+}
+.scenario-grid h3 {
+  margin-top: 15px;
+}
+.media-scroll {
+  max-height: 55vh;
+  overflow: auto;
+  border: 1px solid #d2dec9;
+  border-radius: 16px;
+  background: #e8edde;
+}
+.media-stage {
+  position: relative;
+  min-width: 100%;
+}
+.media-stage .photo {
+  display: block;
+  width: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+.media-stage .illustrated-media figcaption {
+  background: #fff7e9;
+  position: sticky;
+  bottom: 0;
+  padding: 8px 12px;
+}
+.highlight-mode {
+  cursor: crosshair;
+}
+.media-highlight {
+  position: absolute;
+  width: 22%;
+  height: 18%;
+  border: 4px solid #ffc444;
+  background: #f0b63230;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border-radius: 12px;
+}
+.media-viewer video,
+.panorama-view canvas {
+  width: 100%;
+  aspect-ratio: 16/9;
+  max-height: 55vh;
+  background: #223e31;
+  border-radius: 15px;
+}
+.panorama-view canvas {
+  touch-action: none;
+}
+.media-viewer input[type="range"] {
+  width: 220px;
+  margin-top: 4px;
+  padding: 0;
+}
+.media-viewer .actions {
+  align-items: center;
+}
+.media-viewer label {
+  margin: 0;
+}
+.picture-hints .atlas-tile {
+  max-height: 230px;
+}
+.picture-hints button {
+  margin-top: 8px;
+}
+.vocab-layout .atlas-tile {
+  max-height: 350px;
+}
+.guess-layout > div:first-child h2 {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+}
+.guess-layout > div:first-child > p {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+.guess-layout .clue {
+  margin: 12px 0;
+}
+.guess-layout .clue .illustrated-media {
+  max-width: 360px;
+}
+.guess-layout .clue .atlas-tile {
+  max-height: none;
+}
+.guess-layout .actions {
+  margin: 12px 0;
+}
+.guess-layout .actions button {
+  font-size: 0.8rem;
+}
+.scenario-grid .illustrated-media {
+  max-width: 190px;
+  margin: 0 auto;
+}
+.scenario-grid h3 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+.scenario-grid article p {
+  font-size: 0.7rem;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+.scenario-grid ~ h2.center {
+  font-size: 1.65rem;
+  margin: 12px 0;
+}
+.scenario-grid ~ .process {
+  font-size: 0.85rem;
+  margin: 12px 0;
+}
+.scenario-grid ~ .process span {
+  padding: 9px 18px;
+}
+.scenario-grid ~ p.center {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 12px 0;
+}

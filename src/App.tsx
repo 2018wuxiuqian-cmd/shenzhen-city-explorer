@@ -1,6 +1,14 @@
+import Media from "./Media";
+import {
+  cityClueIndices,
+  vocabPlaceIndices,
+  suppliedCityPhoto,
+} from "./illustrations";
+import MediaViewer from "./MediaViewer";
 import { useEffect, useState } from "react";
 import {
   allPlaces,
+  another,
   places,
   districts,
   categories,
@@ -21,20 +29,6 @@ import {
   type State,
 } from "./state";
 
-function Media({ src, label }: { src?: string | null; label: string }) {
-  const [bad, setBad] = useState(false);
-  useEffect(() => setBad(false), [src]);
-  return src && !bad ? (
-    <img className="photo" src={src} alt={label} onError={() => setBad(true)} />
-  ) : (
-    <div className="placeholder" role="img" aria-label={label + "：素材待补"}>
-      <span>▧</span>
-      <strong>真实素材待补</strong>
-      <small>{label}</small>
-      <small>占位界面 · 不代表实景</small>
-    </div>
-  );
-}
 function Map({
   state,
   onPlace,
@@ -160,6 +154,7 @@ export default function App() {
     [hint, setHint] = useState(0),
     [revealed, setRevealed] = useState(false),
     [clue, setClue] = useState(0),
+    [pictureClue, setPictureClue] = useState(0),
     [district, setDistrict] = useState("全部"),
     [preview, setPreview] = useState<Place | null>(null),
     [zoom, setZoom] = useState(false),
@@ -201,6 +196,7 @@ export default function App() {
     const p = Math.max(1, Math.min(12, n));
     setS((v) => ({ ...v, currentPage: p, currentStep: v.steps[p] || 0 }));
     setHint(0);
+    setPictureClue(0);
     setRevealed(false);
     setZoom(false);
   }
@@ -214,6 +210,12 @@ export default function App() {
       };
     });
     setRevealed(false);
+  }
+  function nextStep() {
+    if (page === 1) {
+      setClue((v) => Math.min(v + 1, cities[city].clues.length - 1));
+      setRevealed(false);
+    } else advance();
   }
   useEffect(() => {
     function keyboard(e: KeyboardEvent) {
@@ -237,7 +239,7 @@ export default function App() {
       }
       if (e.key === " ") {
         e.preventDefault();
-        advance();
+        nextStep();
       }
       if (e.key.toLowerCase() === "h") setHint((v) => Math.min(3, v + 1));
       if (e.key.toLowerCase() === "r") setRevealed((v) => !v);
@@ -411,19 +413,22 @@ export default function App() {
   switch (page) {
     case 1:
       content = (
-        <div className="split">
+        <div className="split guess-layout">
           <div>
             <span className="eyebrow">01 / NOTICE · GUESS · REVISE</span>
-            <h2>
-              Which city
-              <br />
-              could it be?
-            </h2>
+            <h2>Which city could it be?</h2>
             <p>先猜测，再说证据；新的线索可以改变你的想法。</p>
             <div className="clue">
               <Media
-                src={`assets/cities/${cities[city].name.toLowerCase().replaceAll(" ", "-")}-${clue + 1}.jpg`}
-                label={cities[city].clues[clue]}
+                src={suppliedCityPhoto(cities[city].name, clue)}
+                label={`第 ${clue + 1} 张城市线索`}
+                illustration={{
+                  sheet: "cities",
+                  index:
+                    cityClueIndices[city][
+                      Math.min(clue, cityClueIndices[city].length - 1)
+                    ],
+                }}
               />
             </div>
             {city !== 3 && (
@@ -465,7 +470,7 @@ export default function App() {
                 </h2>
                 {city === 3 && (
                   <p>
-                    世界之窗的复制建筑会改变我们的猜测。实拍照片待补，不能以巴黎照片替代。
+                    世界之窗的复制建筑会改变我们的猜测。当前是复制景观概念插画，不是深圳实拍证据。
                   </p>
                 )}
               </>
@@ -491,7 +496,10 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <small>图片占位不能替代正式猜图素材；补齐实拍后使用。</small>
+            <small>
+              当前使用 AI
+              教学插画，不是实拍；可以用于猜测，真实场景证据仍待核实。
+            </small>
           </div>
         </div>
       );
@@ -504,7 +512,10 @@ export default function App() {
               .slice(0, Math.min(step + 1, 3))
               .map((icon, i) => (
                 <article key={icon}>
-                  <span className="scenario-icon">{icon}</span>
+                  <Media
+                    label="国际旅行与城市交流情境插画"
+                    illustration={{ sheet: "cities", index: 13 + i }}
+                  />
                   <h3>
                     {
                       [
@@ -585,7 +596,19 @@ export default function App() {
             {support && (
               <div className="picture-hints">
                 {support}
-                <Media label="无名称深圳实景提示照片，待补" />
+                <div>
+                  <Media
+                    label="无名称地点图片提示"
+                    illustration={{ sheet: "places", index: pictureClue }}
+                  />
+                  <button
+                    onClick={() =>
+                      setPictureClue((v) => (v + 1) % places.length)
+                    }
+                  >
+                    下一张图片提示
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -738,7 +761,10 @@ export default function App() {
         <div className="vocab-layout">
           <div>
             <span className="eyebrow">GUESS → REVEAL → USE</span>
-            <Media label={examples[step]} />
+            <Media
+              label={examples[step]}
+              illustration={{ sheet: "places", index: vocabPlaceIndices[step] }}
+            />
             <h3>{examples[step]}</h3>
             {revealed ? (
               <h2>{vocab[step]}</h2>
@@ -821,7 +847,13 @@ export default function App() {
             <button
               onClick={() =>
                 setPreview({
-                  ...allPlaces[0],
+                  ...another,
+                  id: "visitor",
+                  nameEn: "Tripadvisor 原帖完整截图",
+                  illustration: null,
+                  source:
+                    "https://www.tripadvisor.com/ShowTopic-g294211-i642-k15565909-First_trip_itinerary_help-China.html",
+                  license: "截图来源与授权待核实",
                   nameZh: "Karishma 原帖完整截图",
                   image: "assets/visitor/karishma-full-post.png",
                 })
@@ -1131,15 +1163,8 @@ export default function App() {
           </button>
         </div>
         <div>
-          <button
-            onClick={() => {
-              if (page === 1) {
-                setClue((v) => Math.min(v + 1, cities[city].clues.length - 1));
-                setRevealed(false);
-              } else advance();
-            }}
-          >
-            Step {step + 1}
+          <button onClick={nextStep}>
+            Step {page === 1 ? clue + 1 : step + 1}
           </button>
           <button onClick={() => setHint((v) => Math.min(3, v + 1))}>
             Hint
@@ -1176,8 +1201,7 @@ export default function App() {
               关闭 ×
             </button>
             <h2>{preview.nameZh}</h2>
-            <Media src={preview.image} label={preview.nameEn} />
-            <p>当前仅静态照片接口；未提供真实 360 媒体，不标称 360。</p>
+            <MediaViewer place={preview} />
             <small>
               {preview.source} · {preview.license}
             </small>
@@ -1307,6 +1331,7 @@ export default function App() {
                   setS(initial());
                   setCity(0);
                   setClue(0);
+                  setPictureClue(0);
                   setHint(0);
                   setRevealed(false);
                   setExtracted([]);

@@ -1,3 +1,4 @@
+import type { Illustration } from "./illustrations";
 export const districts = [
   "南山",
   "福田",
@@ -33,7 +34,9 @@ export type Place = {
   textbookCategory: string | null;
   image: string | null;
   panorama: string | null;
+  panoramaVerified?: boolean;
   video: string | null;
+  illustration?: Illustration | null;
   source: string;
   license: string;
   verificationStatus: string;
@@ -133,7 +136,7 @@ const rows: [string, string, string, string, string[], string | null][] = [
   ],
 ];
 export const places: Place[] = rows.map(
-  ([id, nameZh, nameEn, district, tags, textbookCategory]) => ({
+  ([id, nameZh, nameEn, district, tags, textbookCategory], index) => ({
     id,
     nameZh,
     nameEn,
@@ -145,8 +148,9 @@ export const places: Place[] = rows.map(
     image: null,
     panorama: null,
     video: null,
+    illustration: { sheet: "places", index },
     source: "地点候选；行政区及馆址请据官方地点资料复核后替换。未采用经纬度。",
-    license: "媒体授权待补",
+    license: "AI 插画按用户要求生成；真实照片授权待补",
     verificationStatus: "pending",
   }),
 );
@@ -227,7 +231,7 @@ export const cities = [
     name: "Beijing",
     flag: "🇨🇳",
     clues: [
-      "北京烤鸭 · Roast duck",
+      "Roast duck",
       "长城 · The Great Wall",
       "故宫 · The Forbidden City",
     ],

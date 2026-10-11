@@ -2,7 +2,7 @@
 
 离线优先的六年级 Unit 6 “What is a city?” React + TypeScript 交互课件。包含 P01–P12、一体机教师控制、深圳探索示意地图、教材翻页、分类与推荐任务、纸质卡打印、浏览器课堂状态恢复。
 
-本版本课堂流程可运行。真实行政区边界、深圳实拍、城市线索照片、游客原帖截图仍待补；界面有明确占位，未生成假地图、经纬度、游客引语或学生反馈。教材图片来自用户提供的 12 页扫描件，其中 P62 / P66 / P68 / P72 已逐页核对。详见 [ASSET_MANIFEST.md](ASSET_MANIFEST.md)、[KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)。
+本版本课堂流程可运行。按用户后续授权，城市线索、深圳地点及欢迎情境现使用 32 幅 AI 教学插画，每张可见标记“非实拍”。真实行政区边界、现场照片与游客原帖仍待补；未生成假地图、经纬度、游客引语或学生反馈。教材图片来自用户提供的 12 页扫描件，其中 P62 / P66 / P68 / P72 已逐页核对。详见 [ASSET_MANIFEST.md](ASSET_MANIFEST.md)、[KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)。
 
 ## Windows 本地启动
 
@@ -54,7 +54,7 @@ npm run test:e2e
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-端到端测试运行生产构建，覆盖 12 页导航、重复提及、分类和推荐联动、真实教材、缺图降级、默认隐藏支架、纸质任务、JSON 恢复/重置，以及浏览器完全离线后刷新并完成教学。测试结果以实际运行输出为准。
+课堂端到端测试运行生产构建，另在 Vite 开发服务中用合成色带测试 WebGL 全景渲染与媒体降级；测试自动管理 4173 / 5175 两个端口。课堂测试覆盖 12 页导航、重复提及、分类和推荐联动、真实教材、缺图降级、默认隐藏支架、纸质任务、JSON 恢复/重置，以及浏览器完全离线后刷新并完成教学。测试结果以实际运行输出为准。
 
 ## 结构与素材替换
 
@@ -62,10 +62,12 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 - `src/state.ts`：统一动态课堂状态、持久化与恢复校验。
 - `src/data.ts`：15 个预置地点候选、另一个地点、教材问题、城市线索；静态数据与课堂状态分离。
 - `public/assets/textbook/`：真实教材本地图片。
+- `public/assets/generated/`、`GENERATED_ASSETS.md`：两张 AI 插画图集及逐格出处说明。
+- `src/Media.tsx`、`src/MediaViewer.tsx`、`src/Panorama.tsx`：图片降级、放大高亮、本地视频与球面全景。
 - `scripts/generate-sw.mjs`：构建后预缓存所有本地资源。
 - `src/state.test.ts`、`tests/classroom.spec.ts`：状态单元测试与浏览器验收。
 - `TEACHER_GUIDE.md`、`TEACHING_DESIGN.md`：操作说明与按空白模板整理的课时设计。
 
-地点的 image 字段填本地相对路径（例如 `assets/places/window.jpg`），文件放 `public/assets/places/`。填写可追溯来源、授权、核验状态后重新构建；不要使用在线 URL 作为核心资源。panorama / video 字段预留，本版本未实现全景或视频播放器。照片加载失败显示占位。
+地点的 image 字段填本地相对路径（例如 `assets/places/window.jpg`），文件放 `public/assets/places/`。填写可追溯来源、授权、核验状态后重新构建；不要使用在线 URL 作为核心资源。video 支持本地视频按需播放（不自动播放）。panorama 仅在 panoramaVerified=true 且使用本地 2:1 球面图片时开放 360 查看；需先核验真实媒体与授权，AI 插画不作为全景。WebGL 不支持、格式错误、加载失败会回退静态素材。静态素材可局部放大、手动高亮并还原完整上下文。
 
 当前云环境使用已有独立 checkout，不创建 Git worktree。课堂状态保存在当前浏览器 `localStorage`，不发往服务器；跨浏览器、换电脑使用设置中的导出/恢复 JSON。只导入本课工具生成的文件。
