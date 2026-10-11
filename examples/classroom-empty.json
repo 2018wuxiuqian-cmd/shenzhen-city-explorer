@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "currentPage": 1,
+  "currentStep": 0,
+  "steps": {},
+  "discoveredPlaceIds": [],
+  "mentions": {},
+  "placeCategories": {},
+  "selectedRecommendationPlaceIds": [],
+  "recommendations": [],
+  "teacherSettings": {
+    "reducedMotion": false,
+    "largeFont": false,
+    "quickMode": true
+  }
+}
