@@ -9,7 +9,7 @@
 安装 Node.js 22 LTS 或 24 LTS、Git。在 PowerShell 执行：
 
 ```powershell
-git clone https://github.com/2018wuxiuqian-cmd/shenzhen-city-explorer.git
+git clone --branch codex/shenzhen-city-explorer-v3 https://github.com/2018wuxiuqian-cmd/shenzhen-city-explorer.git
 cd shenzhen-city-explorer
 npm ci
 npm run dev
